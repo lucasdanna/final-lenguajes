@@ -95,7 +95,7 @@
               <img class="w-full h-48 object-cover" loading="lazy" src="${assetImage(n.image_url, 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?w=800&h=400&fit=crop')}" alt="Noticia">
               <div class="p-6">
                 <h3 class="font-bold text-xl mb-3 text-gray-800">${htmlesc(n.title)}</h3>
-                <p class="text-gray-600 mb-4">${htmlesc((n.body||'').slice(0,150))}${(n.body||'').length>150?'…':''}</p>
+                <p class="text-gray-600 mb-4 line-clamp-3">${htmlesc((n.body||'').slice(0,150))}${(n.body||'').length>150?'…':''}</p>
                 <div class="flex items-center justify-between">
                   <div class="text-sm text-gray-500">${new Date(n.published_at).toLocaleString()}</div>
                   <a href="noticias.html#id=${n.id}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">📖 Leer más</a>
