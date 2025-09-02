@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixture - Club Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-gray-900 text-white shadow">
+    <nav class="container mx-auto p-4">
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="hover:underline">← Inicio</a>
+        <h1 class="text-2xl font-bold">📅 Fixture</h1>
+      </div>
+    </nav>
+  </header>
+  <main class="container mx-auto p-6">
+    <div class="overflow-auto bg-white rounded-2xl shadow">
+      <table class="w-full text-left">
+        <thead class="bg-gray-800 text-white"><tr><th class="p-3">Fecha</th><th class="p-3">Rival</th><th class="p-3">Lugar</th><th class="p-3">Condición</th><th class="p-3">Competición</th><th class="p-3">Notas</th></tr></thead>
+        <tbody id="fixtureBody"></tbody>
+      </table>
+    </div>
+  </main>
+  <script src="/frontend/js/fixtures.js"></script>
+</body>
+</html>
+
