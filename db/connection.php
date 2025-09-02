@@ -141,6 +141,12 @@ function migrate(){
     ) ENGINE=InnoDB;
   ");
 
+  // Tickets (venta/control)
+  $pdo->exec("\n    CREATE TABLE IF NOT EXISTS tickets(\n      id INT AUTO_INCREMENT PRIMARY KEY,\n      fixture_id INT NULL,\n      buyer_name VARCHAR(160) NULL,\n      buyer_email VARCHAR(190) NULL,\n      quantity INT NOT NULL DEFAULT 1,\n      unit_price DECIMAL(10,2) NOT NULL DEFAULT 0,\n      status ENUM('paid','pending','cancelled') NOT NULL DEFAULT 'pending',\n      purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n      INDEX (fixture_id)\n    ) ENGINE=InnoDB;\n  ");
+
+  // Agenda (entrenamientos/eventos)
+  $pdo->exec("\n    CREATE TABLE IF NOT EXISTS events(\n      id INT AUTO_INCREMENT PRIMARY KEY,\n      title VARCHAR(160) NOT NULL,\n      start_datetime DATETIME NOT NULL,\n      end_datetime DATETIME NULL,\n      type ENUM('entrenamiento','evento','reunion') NOT NULL DEFAULT 'entrenamiento',\n      location VARCHAR(160) NULL,\n      notes VARCHAR(255) NULL,\n      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n    ) ENGINE=InnoDB;\n  ");
+
   try {
     $pdo->exec("ALTER TABLE users ADD COLUMN user_number VARCHAR(20) NULL AFTER role");
   } catch (PDOException $e) {}
