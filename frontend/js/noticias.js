@@ -1,0 +1,2 @@
+// Noticias page interactions (placeholder)
+

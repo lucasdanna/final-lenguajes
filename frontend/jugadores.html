@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jugadores - Club Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-gray-900 text-white shadow">
+    <nav class="container mx-auto p-4">
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="hover:underline">← Inicio</a>
+        <h1 class="text-2xl font-bold">⚽ Jugadores</h1>
+      </div>
+    </nav>
+  </header>
+  <main class="container mx-auto p-6">
+    <div id="playersGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+  <script>
+    fetch('/api/home.php')
+      .then(r=>r.json())
+      .then((data)=>{
+        // This page is placeholder; real CRUD lives in PHP app
+        const el = document.getElementById('playersGrid');
+        const top = data.top_scorers||[];
+        if(top.length===0){ el.innerHTML = '<p class="text-gray-500">No hay jugadores.</p>'; return; }
+        el.innerHTML = top.map(pl => `
+          <div class="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden">
+            <img class="w-full h-44 object-cover" src="${pl.image_url||('https://ui-avatars.com/api/?name='+encodeURIComponent(pl.name)+'&background=0D8ABC&color=fff')}" alt="${pl.name}">
+            <div class="p-4">
+              <div class="flex items-center justify-between mb-2">
+                <div class="font-semibold text-lg text-gray-800">${pl.name}</div>
+                <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${pl.position}</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                <div class="bg-green-50 rounded p-2"><div class="font-bold text-green-600">${pl.goals}</div><div class="text-xs text-gray-600">Goles</div></div>
+                <div class="bg-blue-50 rounded p-2"><div class="font-bold text-blue-600">${pl.assists}</div><div class="text-xs text-gray-600">Asistencias</div></div>
+                <div class="bg-gray-50 rounded p-2"><div class="font-bold text-gray-600">${pl.player_number||'-'}</div><div class="text-xs text-gray-600">#</div></div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,2 @@
+// Enfermería page interactions (placeholder)
+

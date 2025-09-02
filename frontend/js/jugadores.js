@@ -1,0 +1,2 @@
+// Jugadores page interactions (placeholder)
+

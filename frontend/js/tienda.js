@@ -1,0 +1,2 @@
+// Tienda page interactions (placeholder)
+

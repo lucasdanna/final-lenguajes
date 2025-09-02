@@ -1,0 +1,2 @@
+// Fixtures page interactions (placeholder)
+
