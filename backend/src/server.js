@@ -15,6 +15,8 @@ import { commentsRouter } from './routes/comments.js';
 import { uploadRouter } from './routes/upload.js';
 import { ensureUploadDir } from './utils/fs.js';
 import { shopRouter } from './routes/shop.js';
+import { usersStore } from './db/datastores.js';
+import bcrypt from 'bcryptjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,7 +65,18 @@ io.on('connection', (socket) => {
 });
 
 const port = process.env.PORT || 4000;
-httpServer.listen(port, () => {
+async function ensureDefaultAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) return;
+  const existing = await usersStore.findOne({ email: adminEmail });
+  if (existing) return;
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+  await usersStore.insert({ _id: `admin-${Date.now()}`, name: 'Admin', email: adminEmail, passwordHash, role: 'admin' });
+}
+
+httpServer.listen(port, async () => {
+  await ensureDefaultAdmin();
   // eslint-disable-next-line no-console
   console.log(`API listening on http://localhost:${port}`);
 });

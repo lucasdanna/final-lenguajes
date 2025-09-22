@@ -22,6 +22,7 @@ export function ProductPage() {
         <h2>{product.name}</h2>
         <p>{product.description}</p>
         <strong>€ {product.price.toFixed(2)}</strong>
+        <div>Stock: {product.stock ?? 0}</div>
         <div style={{ display: 'flex', gap: 12, margin: '12px 0' }}>
           <select value={size} onChange={(e) => setSize(e.target.value)}>
             {product.sizes.map((s) => (
@@ -35,7 +36,7 @@ export function ProductPage() {
           </select>
           <input type="number" min={1} value={qty} onChange={(e) => setQty(parseInt(e.target.value || '1', 10))} style={{ width: 80 }} />
         </div>
-        <button onClick={() => add({ productId: product.id, quantity: qty, size, color })}>Añadir al carrito</button>
+        <button disabled={(product.stock ?? 0) <= 0} onClick={() => add({ productId: product.id, quantity: qty, size, color })}>Añadir al carrito</button>
       </div>
     </div>
   )

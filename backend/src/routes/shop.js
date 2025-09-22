@@ -70,6 +70,19 @@ shopRouter.get('/products/:id', async (req, res) => {
 shopRouter.post('/orders', async (req, res) => {
   const { customer, items, total } = req.body;
   if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'Empty order' });
+  // Check stock
+  for (const it of items) {
+    const p = await productsStore.findOne({ id: it.productId });
+    if (!p) return res.status(400).json({ error: `Product ${it.productId} not found` });
+    const stock = p.stock ?? 100;
+    if (stock < it.quantity) return res.status(400).json({ error: `Sin stock para ${p.name}` });
+  }
+  // Decrement stock
+  for (const it of items) {
+    const p = await productsStore.findOne({ id: it.productId });
+    const stock = (p.stock ?? 100) - it.quantity;
+    await productsStore.update({ id: it.productId }, { $set: { stock } });
+  }
   const order = {
     _id: uuidv4(),
     number: Math.floor(100000 + Math.random() * 900000),

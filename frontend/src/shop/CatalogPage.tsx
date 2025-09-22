@@ -48,7 +48,8 @@ export function CatalogPage() {
             </Link>
             <p>{p.category}</p>
             <strong>€ {p.price.toFixed(2)}</strong>
-            <button onClick={() => add({ productId: p.id, quantity: 1, size: p.sizes[0], color: p.colors[0] })}>Añadir al carrito</button>
+            <div>Stock: {p.stock ?? 0}</div>
+            <button disabled={(p.stock ?? 0) <= 0} onClick={() => add({ productId: p.id, quantity: 1, size: p.sizes[0], color: p.colors[0] })}>Añadir al carrito</button>
           </div>
         ))}
       </div>
