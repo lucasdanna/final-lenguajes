@@ -3,11 +3,16 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { AuthProvider } from './lib/auth'
+import { CartProvider } from './shop/cart'
 import { AppLayout } from './ui/AppLayout'
 import { LoginPage } from './ui/LoginPage'
 import { RegisterPage } from './ui/RegisterPage'
 import { PostsPage } from './ui/PostsPage'
 import { PostDetailPage } from './ui/PostDetailPage'
+import { CatalogPage } from './shop/CatalogPage'
+import { ProductPage } from './shop/ProductPage'
+import { CartPage } from './shop/CartPage'
+import { CheckoutPage } from './shop/CheckoutPage'
 
 const router = createBrowserRouter([
   {
@@ -18,6 +23,10 @@ const router = createBrowserRouter([
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'posts/:id', element: <PostDetailPage /> },
+      { path: 'shop', element: <CatalogPage /> },
+      { path: 'shop/product/:id', element: <ProductPage /> },
+      { path: 'shop/cart', element: <CartPage /> },
+      { path: 'shop/checkout', element: <CheckoutPage /> },
     ],
   },
 ])
@@ -25,7 +34,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
     </AuthProvider>
   </StrictMode>,
 )

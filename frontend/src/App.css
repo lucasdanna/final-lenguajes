@@ -24,6 +24,26 @@ button {
   padding: 8px 12px;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.cart-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid #333;
+  padding: 8px 0;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
