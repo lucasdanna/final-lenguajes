@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { productsStore, ordersStore } from '../db/datastores.js';
+import { authMiddleware, adminMiddleware } from './auth.js';
+import Stripe from 'stripe';
 import { v4 as uuidv4 } from 'uuid';
 
 export const shopRouter = Router();
@@ -78,5 +80,61 @@ shopRouter.post('/orders', async (req, res) => {
   };
   await ordersStore.insert(order);
   res.status(201).json(order);
+});
+
+// Admin: product CRUD + stock
+shopRouter.post('/admin/products', authMiddleware, adminMiddleware, async (req, res) => {
+  const p = req.body;
+  if (!p?.name || !p?.price) return res.status(400).json({ error: 'Missing fields' });
+  const product = { ...p, id: p.id || uuidv4(), stock: p.stock ?? 100 };
+  await productsStore.insert(product);
+  res.status(201).json(product);
+});
+
+shopRouter.put('/admin/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  const updated = await productsStore.update({ id: req.params.id }, { $set: { ...req.body } }, { returnUpdatedDocs: true });
+  if (!updated) return res.status(404).json({ error: 'Not found' });
+  res.json(updated);
+});
+
+shopRouter.delete('/admin/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  const num = await productsStore.remove({ id: req.params.id }, { multi: false });
+  if (!num) return res.status(404).json({ error: 'Not found' });
+  res.status(204).end();
+});
+
+// Admin: orders list/update
+shopRouter.get('/admin/orders', authMiddleware, adminMiddleware, async (req, res) => {
+  const items = await ordersStore.cfind({}).sort({ createdAt: -1 }).limit(500).exec();
+  res.json({ items });
+});
+
+shopRouter.put('/admin/orders/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  const updated = await ordersStore.update({ _id: req.params.id }, { $set: { status: req.body.status } }, { returnUpdatedDocs: true });
+  if (!updated) return res.status(404).json({ error: 'Not found' });
+  res.json(updated);
+});
+
+// Stripe checkout (optional)
+shopRouter.post('/checkout/stripe', async (req, res) => {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return res.status(400).json({ error: 'Stripe not configured' });
+  const stripe = new Stripe(key, { apiVersion: '2025-04-30' });
+  const { items, successUrl, cancelUrl } = req.body;
+  if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'No items' });
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    line_items: items.map((i) => ({
+      price_data: {
+        currency: 'eur',
+        product_data: { name: i.name },
+        unit_amount: Math.round(i.price * 100),
+      },
+      quantity: i.quantity,
+    })),
+    success_url: successUrl || `${process.env.CLIENT_ORIGIN}/shop`,
+    cancel_url: cancelUrl || `${process.env.CLIENT_ORIGIN}/shop/cart`,
+  });
+  res.json({ url: session.url });
 });
 

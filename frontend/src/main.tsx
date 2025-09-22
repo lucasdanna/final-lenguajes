@@ -14,6 +14,8 @@ import { CatalogPage } from './shop/CatalogPage'
 import { ProductPage } from './shop/ProductPage'
 import { CartPage } from './shop/CartPage'
 import { CheckoutPage } from './shop/CheckoutPage'
+import { AdminProductsPage } from './admin/AdminProductsPage'
+import { AdminOrdersPage } from './admin/AdminOrdersPage'
 
 const router = createBrowserRouter([
   {
@@ -28,6 +30,8 @@ const router = createBrowserRouter([
       { path: 'shop/product/:id', element: <ProductPage /> },
       { path: 'shop/cart', element: <CartPage /> },
       { path: 'shop/checkout', element: <CheckoutPage /> },
+      { path: 'admin/products', element: <AdminProductsPage /> },
+      { path: 'admin/orders', element: <AdminOrdersPage /> },
     ],
   },
 ])

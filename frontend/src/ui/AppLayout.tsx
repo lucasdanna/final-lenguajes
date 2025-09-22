@@ -14,6 +14,14 @@ export function AppLayout() {
         <Link to="/shop">Tienda</Link>
         <Link to="/shop/cart">Carrito ({totalItems})</Link>
         <div style={{ marginLeft: 'auto' }}>
+          {user?.role === 'admin' && (
+            <>
+              <Link to="/admin/products">Admin Productos</Link>
+              <span> · </span>
+              <Link to="/admin/orders">Admin Pedidos</Link>
+              <span> · </span>
+            </>
+          )}
           {user ? (
             <>
               <span style={{ marginRight: 8 }}>Hola, {user.name}</span>

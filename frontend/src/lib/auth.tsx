@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import api from './api'
 
-type User = { id: string; name: string; email: string }
+type User = { id: string; name: string; email: string; role?: 'user' | 'admin' }
 
 type AuthContextType = {
   user: User | null
