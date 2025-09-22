@@ -14,4 +14,6 @@ function createStore(filename) {
 export const usersStore = createStore('users.db');
 export const postsStore = createStore('posts.db');
 export const commentsStore = createStore('comments.db');
+export const productsStore = createStore('products.db');
+export const ordersStore = createStore('orders.db');
 

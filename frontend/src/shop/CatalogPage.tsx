@@ -1,15 +1,16 @@
 import { useMemo, useState } from 'react'
-import { products } from './data'
 import { useCart } from './cart'
 import { Link } from 'react-router-dom'
+import { useProducts } from './products'
 
 export function CatalogPage() {
   const { add } = useCart()
+  const { products, loading } = useProducts()
   const [q, setQ] = useState('')
   const [category, setCategory] = useState('')
   const [sort, setSort] = useState<'name' | 'price'>('name')
 
-  const categories = useMemo(() => Array.from(new Set(products.map((p) => p.category))), [])
+  const categories = useMemo(() => Array.from(new Set(products.map((p) => p.category))), [products])
 
   const filtered = useMemo(() => {
     let list = products.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()) || p.description.toLowerCase().includes(q.toLowerCase()))
@@ -18,6 +19,8 @@ export function CatalogPage() {
     if (sort === 'price') list = list.slice().sort((a, b) => a.price - b.price)
     return list
   }, [q, category, sort])
+
+  if (loading) return <p>Cargando productos...</p>
 
   return (
     <div>

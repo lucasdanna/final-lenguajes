@@ -14,6 +14,7 @@ import { postsRouter } from './routes/posts.js';
 import { commentsRouter } from './routes/comments.js';
 import { uploadRouter } from './routes/upload.js';
 import { ensureUploadDir } from './utils/fs.js';
+import { shopRouter } from './routes/shop.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,6 +50,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/posts', postsRouter(io));
 app.use('/api/comments', commentsRouter(io));
 app.use('/api/upload', uploadRouter);
+app.use('/api/shop', shopRouter);
 
 // Health
 app.get('/api/health', (req, res) => {

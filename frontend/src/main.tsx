@@ -4,6 +4,7 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { AuthProvider } from './lib/auth'
 import { CartProvider } from './shop/cart'
+import { ProductsProvider } from './shop/products'
 import { AppLayout } from './ui/AppLayout'
 import { LoginPage } from './ui/LoginPage'
 import { RegisterPage } from './ui/RegisterPage'
@@ -34,9 +35,11 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <CartProvider>
-        <RouterProvider router={router} />
-      </CartProvider>
+      <ProductsProvider>
+        <CartProvider>
+          <RouterProvider router={router} />
+        </CartProvider>
+      </ProductsProvider>
     </AuthProvider>
   </StrictMode>,
 )

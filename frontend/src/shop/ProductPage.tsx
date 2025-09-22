@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { products } from './data'
 import { useCart } from './cart'
+import { useProducts } from './products'
 
 export function ProductPage() {
   const { id } = useParams()
-  const product = useMemo(() => products.find((p) => p.id === id), [id])
+  const { products, loading } = useProducts()
+  const product = useMemo(() => products.find((p) => p.id === id), [id, products])
   const { add } = useCart()
   const [size, setSize] = useState(product?.sizes[0])
   const [color, setColor] = useState(product?.colors[0])
   const [qty, setQty] = useState(1)
 
+  if (loading) return <p>Cargando...</p>
   if (!product) return <p>Producto no encontrado</p>
 
   return (

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { CartItem, Product } from './types'
-import { products } from './data'
+import { useProducts } from './products'
 
 type CartContextType = {
   items: CartItem[]
@@ -66,11 +66,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([])
   }
 
+  const { products } = useProducts()
   const itemsDetailed = useMemo(() => {
     return items
       .map((ci) => ({ ...ci, product: products.find((p) => p.id === ci.productId)! }))
       .filter((x) => Boolean(x.product))
-  }, [items])
+  }, [items, products])
 
   const totalItems = useMemo(() => items.reduce((a, b) => a + b.quantity, 0), [items])
   const totalPrice = useMemo(() => itemsDetailed.reduce((a, b) => a + b.quantity * b.product.price, 0), [itemsDetailed])
