@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const fssync = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const { Product } = require('./models/Product');
 
 const router = Router();
 
@@ -26,31 +26,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-const DB_PATH = path.join(__dirname, 'db.json');
-
-async function readDb() {
-  try {
-    const raw = await fs.readFile(DB_PATH, 'utf8');
-    return JSON.parse(raw || '{"products":[]}');
-  } catch (err) {
-    if (err.code === 'ENOENT') {
-      await fs.writeFile(DB_PATH, JSON.stringify({ products: [] }, null, 2));
-      return { products: [] };
-    }
-    throw err;
-  }
-}
-
-async function writeDb(data) {
-  const tmp = DB_PATH + '.tmp';
-  await fs.writeFile(tmp, JSON.stringify(data, null, 2));
-  await fs.rename(tmp, DB_PATH);
-}
+// JSON file storage removed; using MongoDB via Mongoose
 
 router.get('/', async (_req, res) => {
   try {
-    const db = await readDb();
-    res.json(db.products);
+    const products = await Product.find().sort({ createdAt: -1 }).lean();
+    res.json(products);
   } catch (e) {
     res.status(500).json({ error: 'Error leyendo productos' });
   }
@@ -58,8 +39,7 @@ router.get('/', async (_req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const db = await readDb();
-    const product = db.products.find((p) => p.id === req.params.id);
+    const product = await Product.findById(req.params.id).lean();
     if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
     res.json(product);
   } catch (e) {
@@ -96,8 +76,7 @@ router.post('/', upload.single('image'), async (req, res) => {
         .filter(Boolean);
     };
 
-    const product = {
-      id: uuidv4(),
+    const product = await Product.create({
       name: String(name),
       description: description ? String(description) : '',
       price: numericPrice,
@@ -105,14 +84,9 @@ router.post('/', upload.single('image'), async (req, res) => {
       sizes: toArray(sizes),
       colors: toArray(colors),
       imageUrl: req.file ? `/uploads/${path.basename(req.file.path)}` : null,
-      createdAt: new Date().toISOString(),
-    };
+    });
 
-    const db = await readDb();
-    db.products.push(product);
-    await writeDb(db);
-
-    res.status(201).json(product);
+    res.status(201).json(product.toJSON());
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Error creando producto' });
@@ -122,11 +96,8 @@ router.post('/', upload.single('image'), async (req, res) => {
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
-    const db = await readDb();
-    const idx = db.products.findIndex((p) => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Producto no encontrado' });
-
-    const current = db.products[idx];
+    const current = await Product.findById(id);
+    if (!current) return res.status(404).json({ error: 'Producto no encontrado' });
     const updates = req.body || {};
 
     const maybeNumber = (val, fallback) => {
@@ -151,21 +122,16 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       } catch {}
     }
 
-    const updated = {
-      ...current,
-      name: updates.name !== undefined ? String(updates.name) : current.name,
-      description: updates.description !== undefined ? String(updates.description) : current.description,
-      price: maybeNumber(updates.price, current.price),
-      category: updates.category !== undefined ? String(updates.category) : current.category,
-      sizes: toArray(updates.sizes, current.sizes),
-      colors: toArray(updates.colors, current.colors),
-      imageUrl: req.file ? `/uploads/${path.basename(req.file.path)}` : current.imageUrl,
-      updatedAt: new Date().toISOString(),
-    };
+    current.name = updates.name !== undefined ? String(updates.name) : current.name;
+    current.description = updates.description !== undefined ? String(updates.description) : current.description;
+    current.price = maybeNumber(updates.price, current.price);
+    current.category = updates.category !== undefined ? String(updates.category) : current.category;
+    current.sizes = toArray(updates.sizes, current.sizes);
+    current.colors = toArray(updates.colors, current.colors);
+    current.imageUrl = req.file ? `/uploads/${path.basename(req.file.path)}` : current.imageUrl;
 
-    db.products[idx] = updated;
-    await writeDb(db);
-    res.json(updated);
+    await current.save();
+    res.json(current.toJSON());
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Error actualizando producto' });
@@ -175,11 +141,8 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const db = await readDb();
-    const idx = db.products.findIndex((p) => p.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Producto no encontrado' });
-    const [removed] = db.products.splice(idx, 1);
-    await writeDb(db);
+    const removed = await Product.findByIdAndDelete(id).lean();
+    if (!removed) return res.status(404).json({ error: 'Producto no encontrado' });
     if (removed && removed.imageUrl) {
       try {
         const imgPath = path.join(uploadsRoot, path.basename(removed.imageUrl));

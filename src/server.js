@@ -3,6 +3,8 @@ const cors = require('cors');
 const path = require('path');
 
 const productsRouter = require('./routes.products');
+const mongoose = require('mongoose');
+const { config } = require('./config');
 
 const app = express();
 
@@ -36,8 +38,21 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor iniciado en http://localhost:${PORT}`);
-});
+const PORT = config.port;
+
+async function start() {
+  try {
+    await mongoose.connect(config.mongoUri, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    console.log('Conectado a MongoDB:', config.mongoUri);
+  } catch (err) {
+    console.error('No se pudo conectar a MongoDB', err.message);
+  }
+  app.listen(PORT, () => {
+    console.log(`Servidor iniciado en http://localhost:${PORT}`);
+  });
+}
+
+start();
 
