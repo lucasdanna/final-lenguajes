@@ -1,5 +1,29 @@
 version: '3.8'
 services:
+  mongo:
+    image: mongo:6
+    container_name: tienda-ropa-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: tienda-ropa-me
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/tienda_ropa
+    depends_on:
+      - mongo
+volumes:
+  mongo_data:
+
+version: '3.8'
+services:
   backend:
     build: ./backend
     ports:

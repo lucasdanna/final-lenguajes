@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - ModaShop</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="container" style="padding:20px 16px;">
+  <a class="btn" href="/">← Volver</a>
+  <h1>Administración de Productos</h1>
+
+  <form id="productForm" style="display:grid;gap:10px;max-width:700px;margin:16px 0;grid-template-columns:1fr 1fr;align-items:end">
+    <label>Nombre
+      <input name="name" required />
+    </label>
+    <label>Precio
+      <input name="price" type="number" step="0.01" min="0" required />
+    </label>
+    <label style="grid-column:1/-1">Descripción
+      <input name="description" />
+    </label>
+    <label>Categoría
+      <select name="category" required>
+        <option>Hombre</option>
+        <option>Mujer</option>
+        <option>Niños</option>
+        <option>Accesorios</option>
+      </select>
+    </label>
+    <label>Talles (coma)
+      <input name="sizes" placeholder="S,M,L" />
+    </label>
+    <label>Colores (coma)
+      <input name="colors" placeholder="Rojo,Azul" />
+    </label>
+    <label style="grid-column:1/-1">Imagen
+      <input name="image" type="file" accept="image/*" />
+    </label>
+    <button class="btn" type="submit" style="grid-column:1/-1;justify-self:start">Cargar producto</button>
+  </form>
+
+  <section>
+    <h2>Listado</h2>
+    <div id="adminList" class="grid cards"></div>
+  </section>
+
+  <script>
+    async function loadAll(){
+      const res = await fetch('/api/products');
+      const items = await res.json();
+      const grid = document.getElementById('adminList');
+      grid.innerHTML = items.map(p=>`
+        <article class="card">
+          <img src="${p.imageUrl || 'https://picsum.photos/seed/'+encodeURIComponent(p.name)+'/600/400'}" alt="${p.name}" />
+          <div class="card-body">
+            <strong>${p.name}</strong>
+            <span class="price">$${p.price}</span>
+            <button class="btn" data-id="${p.id}" data-action="delete">Eliminar</button>
+          </div>
+        </article>
+      `).join('');
+      grid.querySelectorAll('button[data-action="delete"]').forEach(b=>{
+        b.addEventListener('click', async ()=>{
+          if(!confirm('Eliminar producto?')) return;
+          await fetch('/api/products/'+b.dataset.id, { method:'DELETE' });
+          loadAll();
+        });
+      })
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const form = e.currentTarget;
+      const fd = new FormData(form);
+      try{
+        const res = await fetch('/api/products', { method: 'POST', body: fd });
+        if(!res.ok){
+          const err = await res.json().catch(()=>({error:'Error'}));
+          alert(err.error || 'Error');
+          return;
+        }
+        form.reset();
+        loadAll();
+      }catch(err){
+        alert('Error de red');
+      }
+    });
+
+    loadAll();
+  </script>
+</body>
+</html>

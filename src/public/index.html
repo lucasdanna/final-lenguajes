@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tienda de Ropa</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Tienda de ropa con catálogo, destacados y carrito" />
+  <meta name="color-scheme" content="light dark">
+</head>
+<body>
+  <header class="container header">
+    <div class="brand">
+      <a href="/">ModaShop</a>
+    </div>
+    <nav class="nav">
+      <a href="#categorias">Categorías</a>
+      <a href="#destacados">Destacados</a>
+      <a href="#catalogo">Catálogo</a>
+      <a href="/admin.html">Admin</a>
+    </nav>
+    <div class="cart-indicator" id="cartIndicator">0</div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <h1>Estilo para cada día</h1>
+      <p>Descubre las últimas tendencias en moda para todos.</p>
+      <a class="btn" href="#catalogo">Ver catálogo</a>
+    </div>
+  </section>
+
+  <section id="categorias" class="container categories">
+    <h2>Categorías</h2>
+    <div class="grid cats">
+      <a class="cat" data-category="Hombre">Hombre</a>
+      <a class="cat" data-category="Mujer">Mujer</a>
+      <a class="cat" data-category="Niños">Niños</a>
+      <a class="cat" data-category="Accesorios">Accesorios</a>
+    </div>
+  </section>
+
+  <section id="destacados" class="container featured">
+    <h2>Destacados</h2>
+    <div id="featuredGrid" class="grid cards"></div>
+  </section>
+
+  <section id="catalogo" class="container catalog">
+    <h2>Catálogo</h2>
+    <div class="filters">
+      <input id="searchInput" type="search" placeholder="Buscar productos..." />
+      <select id="categoryFilter">
+        <option value="">Todas las categorías</option>
+        <option>Hombre</option>
+        <option>Mujer</option>
+        <option>Niños</option>
+        <option>Accesorios</option>
+      </select>
+      <select id="sortSelect">
+        <option value="">Ordenar</option>
+        <option value="price-asc">Precio: menor a mayor</option>
+        <option value="price-desc">Precio: mayor a menor</option>
+        <option value="name-asc">Nombre A-Z</option>
+        <option value="name-desc">Nombre Z-A</option>
+      </select>
+    </div>
+    <div id="catalogGrid" class="grid cards"></div>
+  </section>
+
+  <aside class="cart" id="cart">
+    <div class="cart-header">
+      <h3>Carrito</h3>
+      <button id="closeCart" aria-label="Cerrar">×</button>
+    </div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <strong id="cartTotal">$0</strong>
+      </div>
+      <button class="btn" id="checkoutBtn">Finalizar compra</button>
+    </div>
+  </aside>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> ModaShop</p>
+      <div class="links">
+        <a href="#">Políticas</a>
+        <a href="#">Devoluciones</a>
+        <a href="#">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
